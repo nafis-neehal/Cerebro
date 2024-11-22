@@ -136,7 +136,29 @@ def main():
         layout="centered"
     )
 
-    # Add logo and title in same line
+    if 'db' not in st.session_state:
+        st.session_state.db = PaperDB()
+
+    if 'loaded' not in st.session_state:
+        loading = st.empty()
+        with loading.container():
+            with st.spinner("Checking database status..."):
+                progress_bar = st.progress(0)
+                needs_init = st.session_state.db.needs_initialization()
+
+                if needs_init:
+                    st.session_state.db.load_initial_papers(progress_bar)
+
+                # Initialize search index after loading papers
+                st.session_state.db._init_search_index()
+
+                progress_bar.empty()
+                st.session_state.db.start_background_fetch()
+                st.session_state.loaded = True
+
+        loading.empty()
+
+    # Logo and title
     col1, col2 = st.columns([1, 4])
     with col1:
         st.image("cerebro.jpg", width=500)
@@ -146,23 +168,14 @@ def main():
     apply_custom_css()
     initialize_session_state()
 
-    if 'db' not in st.session_state:
-        st.session_state.db = PaperDB()
-        st.session_state.db.start_background_fetch()
-
     all_venues = []
     for venues in VENUE_GROUPS.values():
         all_venues.extend(venues)
 
-    for venue in all_venues:
-        for year in range(2010, 2025):
-            st.session_state.db.queue_fetch(venue, year)
-
     with st.container():
-
         search_query = st.text_input(
             "",
-            placeholder="🔍 Search papers...",
+            placeholder=f"🔍 Search across {st.session_state.db.get_paper_count()} papers...",
             key="search_query",
             label_visibility="collapsed"
         )
@@ -176,9 +189,13 @@ def main():
         if search_query:
             venue_filter = None if venue == "All" else venue
             year_filter = None if year == "All" else year
-            results = st.session_state.db.search_papers(
-                search_query, venue_filter, year_filter)
-            st.session_state.filtered_papers = results
+            try:
+                results = st.session_state.db.search_papers(
+                    search_query, venue_filter, year_filter)
+                st.session_state.filtered_papers = results
+            except Exception as e:
+                st.error(f"Search error: {str(e)}")
+                st.session_state.filtered_papers = []
         else:
             st.session_state.filtered_papers = []
 

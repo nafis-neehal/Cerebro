@@ -19,21 +19,44 @@ def initialize_session_state():
         st.session_state.filtered_papers = []
 
 
+# def search_papers(self, query: str, venue: str = None, year: int = None) -> List[Dict[str, Any]]:
+#     """Search papers using FTS index with optional venue/year filters"""
+#     with sqlite3.connect(self.db_path) as conn:
+#         conn.row_factory = sqlite3.Row
+
+#         # Replace hyphens with spaces for search
+#         processed_query = query.replace('-', ' ')
+
+#         sql = '''
+#             SELECT p.*
+#             FROM papers p
+#             JOIN papers_search ps ON p.id = ps.rowid
+#             WHERE papers_search MATCH ?
+#         '''
+#         params = [processed_query]
+
+#         if venue and venue != "All":
+#             sql += ' AND p.venue LIKE ?'
+#             params.append(f'%{venue}%')
+
+#         if year and year != "All":
+#             sql += ' AND p.year = ?'
+#             params.append(year)
+
+#         cursor = conn.execute(sql, params)
+#         return [dict(row) for row in cursor.fetchall()]
+
 def search_papers(self, query: str, venue: str = None, year: int = None) -> List[Dict[str, Any]]:
-    """Search papers using FTS index with optional venue/year filters"""
-    with sqlite3.connect(self.db_path) as conn:
+    conn = self._get_connection()
+    try:
         conn.row_factory = sqlite3.Row
-
-        # Replace hyphens with spaces for search
-        processed_query = query.replace('-', ' ')
-
         sql = '''
-            SELECT p.* 
+            SELECT p.id, p.title, p.authors, p.venue, p.year, p.paper_url, p.abstract 
             FROM papers p
             JOIN papers_search ps ON p.id = ps.rowid
             WHERE papers_search MATCH ?
         '''
-        params = [processed_query]
+        params = [query]
 
         if venue and venue != "All":
             sql += ' AND p.venue LIKE ?'
@@ -43,8 +66,13 @@ def search_papers(self, query: str, venue: str = None, year: int = None) -> List
             sql += ' AND p.year = ?'
             params.append(year)
 
+        sql += ' ORDER BY rank'
+
         cursor = conn.execute(sql, params)
-        return [dict(row) for row in cursor.fetchall()]
+        results = [dict(row) for row in cursor.fetchall()]
+        return results
+    finally:
+        conn.close()
 
 
 def get_paper_link(paper):
@@ -99,45 +127,6 @@ def view_abstract(item):
     st.write(item['abstract'])
 
 
-# def display_papers():
-#     """Display papers for current page with pagination"""
-#     papers_to_display = st.session_state.filtered_papers
-#     total_papers = len(papers_to_display)
-#     total_pages = math.ceil(total_papers / PAPERS_PER_PAGE)
-
-#     # Ensure current page is valid
-#     st.session_state.current_page = max(
-#         1, min(st.session_state.current_page, total_pages))
-
-#     # Calculate start and end indices
-#     start_idx = (st.session_state.current_page - 1) * PAPERS_PER_PAGE
-#     end_idx = min(start_idx + PAPERS_PER_PAGE, total_papers)
-
-#     # Display pagination controls
-#     col1, col2, col3 = st.columns([1, 2, 1])
-
-#     with col1:
-#         if st.session_state.current_page > 1:
-#             if st.button("◀️ Previous"):
-#                 st.session_state.current_page -= 1
-#                 st.rerun()
-
-#     with col2:
-#         st.write(f"Page {st.session_state.current_page} of {total_pages}")
-
-#     with col3:
-#         if st.session_state.current_page < total_pages:
-#             if st.button("Next ▶️"):
-#                 st.session_state.current_page += 1
-#                 st.rerun()
-
-#     # Display papers
-#     if total_papers > 0:
-#         for paper in papers_to_display[start_idx:end_idx]:
-#             display_paper_card(paper)
-#     else:
-#         st.write("No papers found.")
-
 def display_papers():
     papers_to_display = st.session_state.filtered_papers
     total_papers = len(papers_to_display)
@@ -160,13 +149,14 @@ def display_papers():
 
         # Create table rows
         for paper in papers_to_display[start_idx:end_idx]:
-            col1, col2, col3, col4 = st.columns([3, 2, 1, 1])
+            col1, col2, col3, col4 = st.columns([3, 2, 1.5, 1])
             with col1:
                 st.markdown(f"[{paper['title']}]({paper['paper_url']})")
             with col2:
                 st.markdown(f"{paper['authors']}")
             with col3:
-                st.markdown(f"{paper['venue']} {paper['year']}")
+                # st.markdown(f"{paper['venue']} {paper['year']}")
+                st.markdown(f"{paper['venue']}")
             with col4:
                 if paper.get('abstract'):
                     if st.button("View", key=f"abstract_{paper['id']}"):

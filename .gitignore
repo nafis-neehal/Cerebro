@@ -3,5 +3,4 @@ cerebro/
 depr/ 
 
 # Add exception for database
-papers.db
-papers.db-journal
+papers.db*
