@@ -19,33 +19,6 @@ def initialize_session_state():
         st.session_state.filtered_papers = []
 
 
-# def search_papers(self, query: str, venue: str = None, year: int = None) -> List[Dict[str, Any]]:
-#     """Search papers using FTS index with optional venue/year filters"""
-#     with sqlite3.connect(self.db_path) as conn:
-#         conn.row_factory = sqlite3.Row
-
-#         # Replace hyphens with spaces for search
-#         processed_query = query.replace('-', ' ')
-
-#         sql = '''
-#             SELECT p.*
-#             FROM papers p
-#             JOIN papers_search ps ON p.id = ps.rowid
-#             WHERE papers_search MATCH ?
-#         '''
-#         params = [processed_query]
-
-#         if venue and venue != "All":
-#             sql += ' AND p.venue LIKE ?'
-#             params.append(f'%{venue}%')
-
-#         if year and year != "All":
-#             sql += ' AND p.year = ?'
-#             params.append(year)
-
-#         cursor = conn.execute(sql, params)
-#         return [dict(row) for row in cursor.fetchall()]
-
 def search_papers(self, query: str, venue: str = None, year: int = None) -> List[Dict[str, Any]]:
     conn = self._get_connection()
     try:
@@ -86,22 +59,6 @@ def get_paper_link(paper):
     return None
 
 
-# def display_paper_card(paper):
-#     """Display a single paper card"""
-#     st.markdown(f"### {paper['title']}")
-#     st.write(f"**Authors:** {paper['authors']}")
-#     st.write(f"**Event:** {paper['event']}")
-
-#     col1, col2 = st.columns([1, 3])
-#     with col1:
-#         if paper.get('paper_url'):  # Using dict.get() for cleaner access
-#             st.markdown(f"[📄 Paper]({paper['paper_url']})")
-#     with col2:
-#         if paper.get('abstract'):  # Using dict.get() for cleaner access
-#             with st.expander("📝 Abstract"):
-#                 st.write(paper['abstract'])
-#     st.markdown("---")
-
 def display_paper_card(paper):
     """Display a single paper card"""
     with st.container():
@@ -130,12 +87,12 @@ def view_abstract(item):
 def display_papers():
     papers_to_display = st.session_state.filtered_papers
     total_papers = len(papers_to_display)
-    total_pages = math.ceil(total_papers / PAPERS_PER_PAGE)
 
-    start_idx = (st.session_state.current_page - 1) * PAPERS_PER_PAGE
-    end_idx = min(start_idx + PAPERS_PER_PAGE, total_papers)
+    if total_papers > 0:
+        total_pages = math.ceil(total_papers / PAPERS_PER_PAGE)
+        start_idx = (st.session_state.current_page - 1) * PAPERS_PER_PAGE
+        end_idx = min(start_idx + PAPERS_PER_PAGE, total_papers)
 
-    if papers_to_display:
         # Create table headers
         col1, col2, col3, col4 = st.columns([3, 2, 1, 1])
         with col1:
@@ -155,27 +112,26 @@ def display_papers():
             with col2:
                 st.markdown(f"{paper['authors']}")
             with col3:
-                # st.markdown(f"{paper['venue']} {paper['year']}")
                 st.markdown(f"{paper['venue']}")
             with col4:
                 if paper.get('abstract'):
                     if st.button("View", key=f"abstract_{paper['id']}"):
                         view_abstract(paper)
 
-    # Pagination
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col1:
-        if st.session_state.current_page > 1:
-            if st.button("Previous"):
-                st.session_state.current_page -= 1
-                st.rerun()
-    with col2:
-        st.write(f"Page {st.session_state.current_page} of {total_pages}")
-    with col3:
-        if st.session_state.current_page < total_pages:
-            if st.button("Next"):
-                st.session_state.current_page += 1
-                st.rerun()
+        # Pagination
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col1:
+            if st.session_state.current_page > 1:
+                if st.button("Previous"):
+                    st.session_state.current_page -= 1
+                    st.rerun()
+        with col2:
+            st.write(f"Page {st.session_state.current_page} of {total_pages}")
+        with col3:
+            if st.session_state.current_page < total_pages:
+                if st.button("Next"):
+                    st.session_state.current_page += 1
+                    st.rerun()
 
 
 def get_parser_for_venue(venue):

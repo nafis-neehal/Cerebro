@@ -136,6 +136,7 @@ def main():
         layout="centered"
     )
 
+    # Initialize database
     if 'db' not in st.session_state:
         st.session_state.db = PaperDB()
 
@@ -148,31 +149,32 @@ def main():
 
                 if needs_init:
                     st.session_state.db.load_initial_papers(progress_bar)
-
-                # Initialize search index after loading papers
-                st.session_state.db._init_search_index()
+                    # Initialize search index after loading papers
+                    st.session_state.db._init_search_index()
 
                 progress_bar.empty()
                 st.session_state.db.start_background_fetch()
                 st.session_state.loaded = True
-
         loading.empty()
 
     # Logo and title
     col1, col2 = st.columns([1, 4])
     with col1:
-        st.image("cerebro.jpg", width=500)
+        st.image("assets/cerebro.jpg", width=500)
     with col2:
         st.markdown("# Cerebro - Search Engine for AI Conferences")
 
     apply_custom_css()
     initialize_session_state()
 
+    # Get all venues
     all_venues = []
     for venues in VENUE_GROUPS.values():
         all_venues.extend(venues)
 
+    # Main container
     with st.container():
+        # Search bar
         search_query = st.text_input(
             "",
             placeholder=f"🔍 Search across {st.session_state.db.get_paper_count()} papers...",
@@ -180,12 +182,14 @@ def main():
             label_visibility="collapsed"
         )
 
+        # Filters
         col1, col2 = st.columns([1, 1])
         with col1:
             venue = st.selectbox("Conference", ["All"] + all_venues)
         with col2:
             year = st.selectbox("Year", ["All"] + list(range(2024, 2009, -1)))
 
+        # Search logic
         if search_query:
             venue_filter = None if venue == "All" else venue
             year_filter = None if year == "All" else year
@@ -199,6 +203,7 @@ def main():
         else:
             st.session_state.filtered_papers = []
 
+        # Display results
         display_papers()
 
 

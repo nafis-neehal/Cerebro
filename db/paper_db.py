@@ -150,35 +150,6 @@ class PaperDB:
         finally:
             conn.close()
 
-    # def search_papers(self, query: str, venue: str = None, year: int = None) -> List[Dict[str, Any]]:
-    #     conn = self._get_connection()
-    #     # replace hyphens with spaces for search
-    #     query = query.replace('-', ' ')
-    #     try:
-    #         conn.row_factory = sqlite3.Row
-    #         sql = '''
-    #             SELECT p.*
-    #             FROM papers p
-    #             JOIN papers_search ps ON p.id = ps.rowid
-    #             WHERE papers_search MATCH ?
-    #         '''
-    #         params = [query]
-
-    #         if venue and venue != "All":
-    #             sql += ' AND p.venue LIKE ?'
-    #             params.append(f'%{venue}%')
-
-    #         if year and year != "All":
-    #             sql += ' AND p.year = ?'
-    #             params.append(year)
-
-    #         sql += ' ORDER BY rank'
-
-    #         cursor = conn.execute(sql, params)
-    #         return [dict(row) for row in cursor.fetchall()]
-    #     finally:
-    #         conn.close()
-
     def search_papers(self, query: str, venue: str = None, year: int = None) -> List[Dict[str, Any]]:
         conn = self._get_connection()
         # Replace hyphens with spaces for search
