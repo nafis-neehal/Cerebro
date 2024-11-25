@@ -4,19 +4,9 @@
   <img src="assets/cerebro.jpg" alt="Cerebro Logo" width="400"/>
 </p>
 
-Cerebro is a modern, streamlined search engine for discovering and exploring papers from major AI/ML conferences and arXiv. Built with Streamlit, it provides real-time paper aggregation and efficient search capabilities.
+Cerebro is a modern, streamlined search engine for discovering and exploring papers from major AI/ML conferences. Built with Streamlit, it provides real-time paper aggregation and efficient search capabilities across venues like NeurIPS, ICML, ICLR, and the ACL Anthology.
 
-## 🔧 Tech Stack
-
-- **Backend**: Python, SQLite
-- **Frontend**: Streamlit
-- **Search**: SQLite FTS5 for full-text search
-- **APIs**: arXiv API
-- **Parsers**: BeautifulSoup4, XML ElementTree
-- **Database**: SQLite with async background updates
-- **Other Tools**: Make, Git
-
-## ✨ Features & Improvements
+## ✨ New Features & Improvements
 
 ### Conference Paper Search
 - **Smart Database Management**: 
