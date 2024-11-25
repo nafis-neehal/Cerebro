@@ -4,67 +4,8 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 from db.paper_db import PaperDB
 from config import VENUE_GROUPS
-from utils import initialize_session_state, display_papers, view_abstract
-
-
-def parse_arxiv_response(xml_content):
-    root = ET.fromstring(xml_content)
-    papers = []
-    for entry in root.findall('{http://www.w3.org/2005/Atom}entry'):
-        published = entry.find('{http://www.w3.org/2005/Atom}published').text
-        date_obj = datetime.strptime(published, '%Y-%m-%dT%H:%M:%SZ')
-        formatted_date = date_obj.strftime('%Y-%m-%d')
-        paper = {
-            'title': entry.find('{http://www.w3.org/2005/Atom}title').text.strip(),
-            'authors': ', '.join([author.find('{http://www.w3.org/2005/Atom}name').text
-                                  for author in entry.findall('{http://www.w3.org/2005/Atom}author')]),
-            'abstract': entry.find('{http://www.w3.org/2005/Atom}summary').text.strip(),
-            'link': entry.find('{http://www.w3.org/2005/Atom}id').text,
-            'submitted': formatted_date
-        }
-        papers.append(paper)
-    return papers
-
-
-def do_arxiv_search(query, categories, start_idx):
-    if categories and query:
-        cats = "+OR+".join(f"cat:{cat}" for cat in categories)
-        url = f'http://export.arxiv.org/api/query?search_query=({cats})+AND+all:{query}&start={start_idx}&max_results=10&sortBy=submittedDate&sortOrder=descending'
-        try:
-            with urllib.request.urlopen(url) as response:
-                xml_content = response.read().decode('utf-8')
-                return parse_arxiv_response(xml_content)
-        except Exception as e:
-            st.error(f"Error fetching arXiv papers: {str(e)}")
-            return []
-    return []
-
-
-def display_arxiv_papers(papers):
-    if not papers:
-        return
-
-    col1, col2, col3, col4 = st.columns([3, 2, 1, 1])
-    with col1:
-        st.markdown("**Title**")
-    with col2:
-        st.markdown("**Authors**")
-    with col3:
-        st.markdown("**Date**")
-    with col4:
-        st.markdown("**Abstract**")
-
-    for paper in papers:
-        col1, col2, col3, col4 = st.columns([3, 2, 1, 1])
-        with col1:
-            st.markdown(f"[{paper['title']}]({paper['link']})")
-        with col2:
-            st.markdown(f"{paper['authors']}")
-        with col3:
-            st.markdown(f"{paper['submitted']}")
-        with col4:
-            if st.button("View", key=f"abstract_{paper['link']}"):
-                view_abstract(paper)
+from utils import initialize_session_state, display_papers, view_abstract, display_arxiv_papers
+from parsers.arxiv_parser import ArXivParser
 
 
 def main():
@@ -89,6 +30,7 @@ def main():
         loading.empty()
 
     initialize_session_state()
+    arxiv_parser = ArXivParser()
 
     if 'arxiv_start' not in st.session_state:
         st.session_state.arxiv_start = 0
@@ -108,7 +50,7 @@ def main():
         st.title("Cerebro AI Paper Search")
 
     if st.session_state.arxiv_query_submitted:
-        st.session_state.arxiv_papers = do_arxiv_search(
+        st.session_state.arxiv_papers = arxiv_parser.fetch_papers(
             st.session_state.current_arxiv_query,
             st.session_state.current_arxiv_categories,
             st.session_state.arxiv_start
@@ -149,7 +91,7 @@ def main():
     with tabs[1]:
         arxiv_query = st.text_input("Search arXiv papers", key="arxiv_query")
         categories = st.multiselect("Select Categories",
-                                    ["cs.AI", "cs.LG", "cs.CL", "cs.CV"],
+                                    ["cs.AI", "cs.LG", "cs.ML", "cs.CV"],
                                     default=["cs.AI"],
                                     key="category_select")
 
@@ -175,6 +117,9 @@ def main():
                     st.session_state.arxiv_start += 10
                     st.session_state.arxiv_query_submitted = True
                     st.rerun()
+
+    st.markdown(
+        "Made by [Nafis Neehal](https://nafis-neehal.github.io/) with ❤️")
 
 
 if __name__ == "__main__":

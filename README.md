@@ -4,46 +4,48 @@
   <img src="assets/cerebro.jpg" alt="Cerebro Logo" width="400"/>
 </p>
 
-Cerebro is a modern, streamlined search engine for discovering and exploring papers from major AI/ML conferences. Built with Streamlit, it provides real-time paper aggregation and efficient search capabilities across venues like NeurIPS, ICML, ICLR, and the ACL Anthology.
+Cerebro is a modern, streamlined search engine for discovering and exploring papers from major AI/ML conferences and arXiv. Built with Streamlit, it provides real-time paper aggregation and efficient search capabilities.
 
-## ✨ New Features & Improvements
+## 🔧 Tech Stack
 
+- **Backend**: Python, SQLite
+- **Frontend**: Streamlit
+- **Search**: SQLite FTS5 for full-text search
+- **APIs**: arXiv API
+- **Parsers**: BeautifulSoup4, XML ElementTree
+- **Database**: SQLite with async background updates
+- **Other Tools**: Make, Git
+
+## ✨ Features & Improvements
+
+### Conference Paper Search
 - **Smart Database Management**: 
-  - One-time initialization of paper database
-  - Efficient paper fetching with progress tracking
-  - Background updates for new papers
-  - Fast search response times
-  
-- **Makefile Support**:
-  ```bash
-  make clean     # Remove existing database
-  make init      # Initialize fresh database
-  make run      # Start Streamlit app
-  make all      # Complete reset and startup
-  ```
-
-- **Enhanced Search**:
-  - Full-text search across titles and abstracts
-  - Filter by exact conference venues
-  - Year-based filtering
+  - SQLite with FTS5 indexing for fast full-text search
+  - Async background updates using SQLite WAL mode
+  - Progress tracking for initial database population
   - Real-time paper count display
 
-## 🎯 Core Features
+### arXiv Integration
+- **Real-time arXiv Search**:
+  - Direct integration with arXiv API
+  - XML response parsing
+  - Category-based filtering (CS.AI, CS.LG, CS.CL, CS.CV, etc.)
+  - Pagination support for search results
+  - Sorted by submission date (newest first)
 
-- **Paper Aggregation**: Fetches papers from major AI conferences
-- **Conference Coverage**:
-  - **ML Conferences**: NeurIPS, ICML, ICLR
-  - **ACL Venues**: ACL, EMNLP, NAACL, EACL, CoNLL, and more
-- **Paper Details**:
-  - Title and authors
-  - Conference venue and year
-  - Direct paper links
-  - Expandable abstracts
-- **Modern UI**:
-  - Responsive layout
-  - Clean paper display
-  - Pagination controls
-  - Smooth transitions
+### Enhanced UI/UX
+- **Tabbed Interface**:
+  - Separate tabs for conference and arXiv papers
+  - Clean, responsive layout
+  - Abstract preview in dialog windows
+  - Paper metadata display
+
+### Database Architecture
+- **Efficient Schema**:
+  - FTS5 virtual tables for fast search
+  - Indexes on common query fields
+  - Optimized for concurrent reads
+  - Background write operations
 
 ## 🚀 Installation
 
@@ -68,22 +70,40 @@ make run    # Just run the application
 
 ## 💡 Usage
 
-1. Search across all papers using the search bar
-2. Filter by conference venue and year
-3. View paper abstracts with one click
-4. Navigate results with pagination controls
+1. **Conference Papers**:
+   - Search across indexed conference papers
+   - Filter by venue and year
+   - View abstracts and paper links
+
+2. **arXiv Papers**:
+   - Real-time search in arXiv database
+   - Filter by CS categories
+   - Navigate through paginated results
+   - Latest papers first
 
 ## 🏗️ Architecture
 
-- `app.py`: Main Streamlit application
-- `config.py`: Configuration settings
-- `utils.py`: Helper functions
-- `db/`: 
-  - `paper_db.py`: Database management and search
-- `parsers/`:
-  - `base.py`: Base parser class
-  - `acl_parser.py`: ACL Anthology parser
-  - `ml_parser.py`: ML conference parser
+```
+cerebro/
+├── app.py              # Main Streamlit application
+├── config.py           # Configuration and constants
+├── utils.py            # Helper functions
+├── db/
+│   └── paper_db.py     # SQLite database management
+├── parsers/
+│   ├── base.py         # Abstract parser class
+│   ├── acl_parser.py   # ACL Anthology parser
+│   ├── arxiv_parser.py # arXiv API parser
+│   └── ml_parser.py    # ML conference parser
+└── assets/            # Static files
+```
+
+### Key Components:
+- **Database**: SQLite with FTS5 for full-text search
+- **Web UI**: Streamlit for reactive interface
+- **APIs**: arXiv API integration, ACL Anthology/Neurips/ICML/ICLR scraping
+- **Background Tasks**: Async database updates
+- **Search Engine**: SQLite FTS5 with ranking
 
 ## 🤝 Contributing
 

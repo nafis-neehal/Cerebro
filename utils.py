@@ -146,3 +146,30 @@ def get_parser_for_venue(venue):
         return MLConferencePaperParser()
     else:
         raise ValueError(f"No parser found for venue: {venue}")
+
+
+def display_arxiv_papers(papers):
+    if not papers:
+        return
+
+    col1, col2, col3, col4 = st.columns([3, 2, 1, 1])
+    with col1:
+        st.markdown("**Title**")
+    with col2:
+        st.markdown("**Authors**")
+    with col3:
+        st.markdown("**Date**")
+    with col4:
+        st.markdown("**Abstract**")
+
+    for paper in papers:
+        col1, col2, col3, col4 = st.columns([3, 2, 1, 1])
+        with col1:
+            st.markdown(f"[{paper['title']}]({paper['link']})")
+        with col2:
+            st.markdown(f"{paper['authors']}")
+        with col3:
+            st.markdown(f"{paper['submitted']}")
+        with col4:
+            if st.button("View", key=f"abstract_{paper['link']}"):
+                view_abstract(paper)
