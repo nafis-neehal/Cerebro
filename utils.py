@@ -17,6 +17,10 @@ def initialize_session_state():
         st.session_state.search_query = ""
     if 'filtered_papers' not in st.session_state:
         st.session_state.filtered_papers = []
+    if 'current_arxiv_query' not in st.session_state:
+        st.session_state.current_arxiv_query = ""
+    if 'current_arxiv_categories' not in st.session_state:
+        st.session_state.current_arxiv_categories = []
 
 
 def search_papers(self, query: str, venue: str = None, year: int = None) -> List[Dict[str, Any]]:
@@ -119,17 +123,17 @@ def display_papers():
                         view_abstract(paper)
 
         # Pagination
-        col1, col2, col3 = st.columns([1, 2, 1])
+        col1, col2, col3, col4 = st.columns([3, 2, 1, 1])
         with col1:
             if st.session_state.current_page > 1:
-                if st.button("Previous"):
+                if st.button("Previous", type="primary"):
                     st.session_state.current_page -= 1
                     st.rerun()
-        with col2:
-            st.write(f"Page {st.session_state.current_page} of {total_pages}")
-        with col3:
+        # with col3:
+        #     st.write(f"Page {st.session_state.current_page} of {total_pages}")
+        with col4:
             if st.session_state.current_page < total_pages:
-                if st.button("Next"):
+                if st.button("Next", type="primary"):
                     st.session_state.current_page += 1
                     st.rerun()
 

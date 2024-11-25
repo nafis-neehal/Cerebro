@@ -1,5 +1,5 @@
 # Configuration constants
-PAPERS_PER_PAGE = 30
+PAPERS_PER_PAGE = 10
 
 # All ACL venues
 ACL_VENUES = [
