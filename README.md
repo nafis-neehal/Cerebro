@@ -4,7 +4,7 @@
   <img src="assets/cerebro.jpg" alt="Cerebro Logo" width="400"/>
 </p>
 
-Cerebro is a modern, streamlined search engine for discovering and exploring papers from major AI/ML conferences. Built with Streamlit, it provides real-time paper aggregation and efficient search capabilities across venues like NeurIPS, ICML, ICLR, and the ACL Anthology.
+Cerebro is a modern, streamlined search engine for discovering and exploring papers from major AI/ML conferences. Built with Streamlit, it provides real-time paper aggregation and efficient search capabilities across venues like NeurIPS, ICML, ICLR, and the ACL Anthology along with arXiv search.
 
 ## ✨ New Features & Improvements
 
