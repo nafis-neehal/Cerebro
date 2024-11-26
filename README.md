@@ -6,6 +6,8 @@
 
 Cerebro is a modern, streamlined search engine for discovering and exploring papers from major AI/ML conferences. Built with Streamlit, it provides real-time paper aggregation and efficient search capabilities across venues like NeurIPS, ICML, ICLR, and the ACL Anthology along with arXiv search.
 
+Video Demo: https://drive.google.com/file/d/13ajc0AyA_IDs1umJm0K_6Ymn0CLsY4qS/view?usp=sharing 
+
 ## ✨ New Features & Improvements
 
 ### Conference Paper Search
