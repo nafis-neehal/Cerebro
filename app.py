@@ -91,7 +91,7 @@ def main():
     with tabs[1]:
         arxiv_query = st.text_input("Search arXiv papers", key="arxiv_query")
         categories = st.multiselect("Select Categories",
-                                    ["cs.AI", "cs.LG", "cs.ML", "cs.CV"],
+                                    ["cs.AI", "cs.LG", "cs.CL", "cs.CV"],
                                     default=["cs.AI"],
                                     key="category_select")
 
