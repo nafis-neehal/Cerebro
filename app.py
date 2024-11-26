@@ -119,7 +119,7 @@ def main():
                     st.rerun()
 
     st.markdown(
-        "Made by [Nafis Neehal](https://nafis-neehal.github.io/) with ❤️")
+        "Made by [Nafis Neehal](https://nafis-neehal.github.io/)")
 
 
 if __name__ == "__main__":
